@@ -2,11 +2,29 @@ package br.com.cotiinformatica.api_usuarios.repositories;
 
 import br.com.cotiinformatica.api_usuarios.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
+    @Query("""
+        SELECT CASE
+            WHEN COUNT(u) > 0 THEN true
+            ELSE false
+        END
+        FROM Usuario u
+        WHERE u.email = :email
+    """)
+    boolean existsByEmail(@Param("email") String email);
 
+    // Query to find a user by email and password
+    @Query("""
+        SELECT u
+        FROM Usuario u
+        WHERE u.email = :email AND u.senha = :senha
+    """)
+    Usuario findByEmailSenha(@Param("email") String email, @Param("senha") String senha);
 
 }
